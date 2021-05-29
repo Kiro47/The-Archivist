@@ -1,0 +1,6 @@
+---
+Bot:
+  Prefix: "~~~"
+  Token: ""
+Database:
+  Type: 'sqlite'
