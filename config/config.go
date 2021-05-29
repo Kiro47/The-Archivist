@@ -1,9 +1,10 @@
 package config
 
 import (
-	"fmt"
 	"gopkg.in/yaml.v2"
+	"log"
 	"os"
+	"strconv"
 )
 
 var (
@@ -14,7 +15,14 @@ var (
 	Database struct {
 		Type string
 	}
-
+	Log struct {
+		Level string
+		Path string
+		MaxSize int
+		MaxAge int
+		MaxBackups int
+		Compress bool
+	}
 	config = &configStruct{}
 )
 
@@ -26,13 +34,21 @@ type configStruct struct {
 	Database struct {
 		Type string `yaml:"Type"`
 	} `yaml:"Database"`
+	Log struct {
+		Level string `yaml:"Level"`
+		Path string `yaml:"Path"`
+		MaxSize int `yaml:"max_size"`
+		MaxAge int `yaml:"max_age"`
+		MaxBackups int `yaml:"max_backups"`
+		Compress bool `yaml:"compress"`
+	} `yaml:"Log"`
 }
 func LoadConfig(configPath string) error {
 	// Load config file
-	fmt.Println("Loading Archivist Config")
+	log.Println("Loading Archivist Config from " + configPath)
 	file, err := os.Open(configPath)
 	if err != nil {
-		fmt.Println("Error loading config file " + err.Error())
+		log.Fatalln("Error loading config file " + err.Error())
 		return err
 	}
 	// Close file silently, since we only read we can safely ignore any errors.
@@ -44,7 +60,7 @@ func LoadConfig(configPath string) error {
 	decoder := yaml.NewDecoder(file)
 	err = decoder.Decode(&config)
 	if err != nil {
-		fmt.Println("Error parsing config file " + err.Error())
+		log.Fatalln("Error parsing config file " + err.Error())
 		return err
 	}
 
@@ -76,5 +92,54 @@ func LoadConfig(configPath string) error {
 	} else {
 		Database.Type = config.Database.Type
 	}
+	// Log
+	envPrefix = "Archivist_Log_"
+	if value, present := os.LookupEnv(envPrefix + "Level"); present {
+		Log.Level = value
+	} else {
+		Log.Level = config.Log.Level
+	}
+	if value, present := os.LookupEnv(envPrefix + "Path"); present {
+		Log.Path = value
+	} else {
+		Log.Path = config.Log.Path
+	}
+	if value, present := os.LookupEnv(envPrefix + "MaxSize"); present {
+		parsedVal, err := strconv.ParseInt(value, 10, 0)
+		if err != nil {
+			log.Fatalln("Invalid value for Log:MaxSize\n" + err.Error())
+		}
+		Log.MaxSize = int(parsedVal)
+	} else {
+		Log.MaxSize = config.Log.MaxSize
+	}
+	if value, present := os.LookupEnv(envPrefix + "MaxAge"); present {
+		parsedVal, err := strconv.ParseInt(value, 10, 0)
+		if err != nil {
+			log.Fatalln("Invalid value for Log:MaxAge\n" + err.Error())
+		}
+		Log.MaxAge = int(parsedVal)
+	} else {
+		Log.MaxAge = config.Log.MaxAge
+	}
+	if value, present := os.LookupEnv(envPrefix + "MaxBackups"); present {
+		parsedVal, err := strconv.ParseInt(value, 10, 0)
+		if err != nil {
+			log.Fatalln("Invalid value for Log:MaxBackups\n" + err.Error())
+		}
+		Log.MaxBackups = int(parsedVal)
+	} else {
+		Log.MaxBackups = config.Log.MaxBackups
+	}
+	if value, present := os.LookupEnv(envPrefix + "Compress"); present {
+		parsedVal, err := strconv.ParseBool(value)
+		if err != nil {
+			log.Fatalln("Invalid value for Log:Compress\n" + err.Error())
+		}
+		Log.Compress = parsedVal
+	} else {
+		Log.Compress = config.Log.Compress
+	}
+
 	return nil
 }

@@ -3,16 +3,16 @@ package main
 import (
 	"Archivist/config"
 	"Archivist/discord_bot"
-	"fmt"
-	"os"
+	"log"
 )
 
 func main() {
 	err := config.LoadConfig("./config.yaml")
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(-10)
+		log.Fatalln(err.Error())
 	}
+	config.InitLogger()
+
 	discord_bot.BotInit()
 	<-make(chan struct{})
 }

@@ -1,6 +1,7 @@
 # Project specifics
 build/
 config.yaml
+*.log
 
 # Created by https://www.toptal.com/developers/gitignore/api/go,jetbrains+all,vim,emacs,vscode
 # Edit at https://www.toptal.com/developers/gitignore?templates=go,jetbrains+all,vim,emacs,vscode

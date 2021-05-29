@@ -2,35 +2,37 @@ package discord_bot
 
 import (
 	"Archivist/config"
-	"fmt"
+	"Archivist/discord_bot/event_listener"
 	"github.com/bwmarrin/discordgo"
 	"os"
 )
 
-var BotID string
-var BotSession *discordgo.Session
-
+func loadEvents(session *discordgo.Session) {
+	event_listener.InitMessages(session)
+}
 func BotInit() {
-	BotSession, err := discordgo.New("Bot " + config.Bot.Token)
+	botSession, err := discordgo.New("Bot " + config.Bot.Token)
 	if err != nil {
-		fmt.Println("Failed to connect Archivist to Discord.\n" + err.Error())
+		config.ZLog.Panic("Failed to connect Archivist to Discord.\n" + err.Error())
 		os.Exit(-1)
 	}
-	botUser, err := BotSession.User("@me")
+	botUser, err := botSession.User("@me")
 
 	if err != nil {
-		fmt.Println("Failed to obtain Discord BotID.\n" + err.Error())
+		config.ZLog.Panic("Failed to obtain Discord BotID.\n" + err.Error())
 		os.Exit(-2)
 	}
-	BotID = botUser.ID
+
+	// Register all Event listeners
+	loadEvents(botSession)
 
 	// Open session for bot
-	err = BotSession.Open()
+	err = botSession.Open()
 	if err != nil {
-		fmt.Println("Failed to connect to Discord API.\n" + err.Error())
+		config.ZLog.Panic("Failed to connect to Discord API.\n" + err.Error())
 		os.Exit(-3)
 	}
-	fmt.Println("Connected to Discord API with BotID " + BotID)
+	config.ZLog.Info("Connected to Discord API with BotID " + botUser.ID)
 
 	return
 }

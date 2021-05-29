@@ -1,6 +1,22 @@
 ---
 Bot:
+  # Bot prefix to trigger command on
   Prefix: "~~~"
+  # Bot token to login to discord with
   Token: ""
 Database:
+  # Database type, not used currently
   Type: 'sqlite'
+Log:
+  # Log level, currently only debug, more to be added later
+  Level: 'debug'
+  # Path to log file
+  Path: 'Archivist.log'
+  # Max size in megabytes before splitting to new file
+  MaxSize: 500
+  #  Maximum Days to keep logs, 0 disables log deletion
+  MaxAge: 0
+  # Maximum number of backup files to keep, 0 disables log deletion
+  MaxBackups: 0
+  # true/false, gzip compresses rotated log files.
+  Compress: false
