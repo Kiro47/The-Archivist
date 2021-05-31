@@ -13,7 +13,7 @@ func loadEvents(session *discordgo.Session) {
 func BotInit() {
 	botSession, err := discordgo.New("Bot " + config.Bot.Token)
 	if err != nil {
-		config.ZLog.Panic("Failed to connect Archivist to Discord.\n" + err.Error())
+		config.ZLog.Panic("Failed to create bot instance.\n" + err.Error())
 		os.Exit(-1)
 	}
 	botUser, err := botSession.User("@me")

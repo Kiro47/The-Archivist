@@ -14,6 +14,14 @@ var (
 	}
 	Database struct {
 		Type string
+		Host string
+		User string
+		Password string
+		Protocol string
+		Port int
+		DatabaseName string
+		SSL bool
+		Path string
 	}
 	Log struct {
 		Level string
@@ -33,6 +41,14 @@ type configStruct struct {
 	} `yaml:"Bot"`
 	Database struct {
 		Type string `yaml:"Type"`
+		Host string `yaml:"host"`
+		User string `yaml:"user"`
+		Password string `yaml:"password"`
+		Protocol string `yaml:"protocol"`
+		Port int `yaml:"port"`
+		DatabaseName string `yaml:"DatabaseName"`
+		SSL bool `yaml:"ssl"`
+		Path string `yaml:"path"`
 	} `yaml:"Database"`
 	Log struct {
 		Level string `yaml:"Level"`
@@ -91,6 +107,58 @@ func LoadConfig(configPath string) error {
 		Database.Type = value
 	} else {
 		Database.Type = config.Database.Type
+	}
+	if value, present := os.LookupEnv(envPrefix + "Host"); present {
+		Database.Host = value
+	} else {
+		Database.Host = config.Database.Host
+	}
+	if value, present := os.LookupEnv(envPrefix + "User"); present {
+		Database.User = value
+	} else {
+		Database.User = config.Database.User
+	}
+	if value, present := os.LookupEnv(envPrefix + "Password"); present {
+		Database.Password = value
+	} else {
+		Database.Password = config.Database.Password
+	}
+	if value, present := os.LookupEnv(envPrefix + "Protocol"); present {
+		Database.Protocol = value
+	} else {
+		Database.Protocol = config.Database.Protocol
+	}
+	//// Validate protocols
+	if Database.Protocol != "tcp" && Database.Protocol != "udp" {
+		log.Fatalln("Invalid value for Database:Protocol]")
+	}
+	if value, present := os.LookupEnv(envPrefix + "Port"); present {
+		parsedVal, err := strconv.ParseInt(value, 10, 0)
+		if err != nil {
+			log.Fatalln("Invalid value for Database:Port\n" + err.Error())
+		}
+		Database.Port = int(parsedVal)
+	} else {
+		Database.Port = config.Database.Port
+	}
+	if value, present := os.LookupEnv(envPrefix + "DatabaseName"); present {
+		Database.DatabaseName = value
+	} else {
+		Database.DatabaseName = config.Database.DatabaseName
+	}
+	if value, present := os.LookupEnv(envPrefix + "SSL"); present {
+		parsedVal, err := strconv.ParseBool(value)
+		if err != nil {
+			log.Fatalln("Invalid value for Database:SSL\n" + err.Error())
+		}
+		Database.SSL = parsedVal
+	} else {
+		Database.SSL = config.Database.SSL
+	}
+	if value, present := os.LookupEnv(envPrefix + "Path"); present {
+		Database.Path = value
+	} else {
+		Database.Path = config.Database.Path
 	}
 	// Log
 	envPrefix = "Archivist_Log_"

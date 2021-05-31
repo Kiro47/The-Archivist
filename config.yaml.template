@@ -5,8 +5,15 @@ Bot:
   # Bot token to login to discord with
   Token: ""
 Database:
-  # Database type, not used currently
   Type: 'sqlite'
+  Host: 'localhost'
+  User: 'postgres'
+  Password: 'password'
+  Protocol: 'tcp'
+  Port: 5432
+  DatabaseName: 'archivist'
+  SSL: false
+  Path: './archivist.sqlite'
 Log:
   # Log level, currently only debug, more to be added later
   Level: 'debug'
